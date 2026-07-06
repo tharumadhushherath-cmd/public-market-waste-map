@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Market Waste Management Mapping - Western Province</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            text-align: center;
+            height: 50px;
+            box-sizing: border-box;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+        #map {
+            height: calc(100% - 50px);
+            width: 100%;
+        }
+        .report-btn {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white !important;
+            border: none;
+            padding: 8px 14px;
+            margin-top: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            transition: background 0.2s ease;
+        }
+        .report-btn:hover {
+            background-color: #c0392b;
+        }
+        .popup-title {
+            margin: 0 0 4px 0;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>Public Market Waste Management Mapping (Western Province)</h1>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // Initialize map centered to cover Gampaha, Colombo, and Kalutara districts
+        var map = L.map('map').setView([6.9100, 79.9800], 10);
+
+        // Load OpenStreetMap Tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Complete array of 40 markets from your updated lists
+        var markets = [
+            // --- COLOMBO DISTRICT & METRO ---
+            { name: "Pettah Market", lat: 6.9362, lng: 79.8505 },
+            { name: "Floating Market- Pettah", lat: 6.9318, lng: 79.8562 },
+            { name: "Public Market - Maradana Municipal", lat: 6.9255, lng: 79.8658 },
+            { name: "Public Market Dematagoda", lat: 6.9288, lng: 79.8799 },
+            { name: "Saturday Good Market Event", lat: 6.9062, lng: 79.8592 },
+            { name: "Bambalapitiya public Market", lat: 6.8970, lng: 79.8554 },
+            { name: "Kirulapone Market", lat: 6.8835, lng: 79.8732 },
+            { name: "Wellawatta Public Market", lat: 6.8730, lng: 79.8610 },
+            { name: "New Manning Market", lat: 6.9241, lng: 79.9142 },
+            { name: "Narahenpita Economic Centre", lat: 6.9085, lng: 79.8790 },
+            { name: "Kotahena Market", lat: 6.9482, lng: 79.8645 },
+            { name: "Nagalagam Market", lat: 6.9580, lng: 79.8720 },
+            { name: "Borella Market", lat: 6.9140, lng: 79.8785 },
+            { name: "Kollupitoya Market", lat: 6.9118, lng: 79.8498 },
+            { name: "Kosgashandiye Market", lat: 6.9412, lng: 79.8690 },
+            { name: "Jinthupitiya Market", lat: 6.9425, lng: 79.8521 },
+            { name: "Manning Market", lat: 6.9348, lng: 79.8525 },
+            { name: "Maligawatta Market", lat: 6.9320, lng: 79.8715 },
+            { name: "Dehiwala Market", lat: 6.8514, lng: 79.8633 },
+
+            // --- GAMPAHA DISTRICT ---
+            { name: "public market- kiribathgoda", lat: 6.9814, lng: 79.9292 },
+            { name: "Gampaha Market", lat: 7.0897, lng: 80.0033 },
+            { name: "Ja Ela Market", lat: 7.0742, lng: 79.8895 },
+            { name: "Ja Ela Fish Market", lat: 7.0755, lng: 79.8882 },
+            { name: "Kadawatha public Market", lat: 7.0012, lng: 79.9531 },
+            { name: "Veyangoda Public Market", lat: 7.1567, lng: 80.0583 },
+            { name: "Kirindiwela public Market", lat: 7.0425, lng: 80.1294 },
+            { name: "Dompe Public Market", lat: 6.9461, lng: 80.1472 },
+            { name: "Ragama Public Market", lat: 7.0289, lng: 79.9225 },
+            { name: "Weekly public Vegetable Market - Yakkala", lat: 7.0924, lng: 80.0341 },
+            { name: "Negombo Fish Market", lat: 7.2024, lng: 79.8306 },
+            { name: "Negombo Fish Market 1", lat: 7.2090, lng: 79.8390 },
+            { name: "Negombo sunday street Market", lat: 7.2112, lng: 79.8450 },
+            { name: "Negombo Sunday street Market", lat: 7.2115, lng: 79.8455 }, 
+            { name: "Weliweriya Fish Market", lat: 7.0345, lng: 80.0210 },
+            { name: "Weliweriya Public Market", lat: 7.0350, lng: 80.0225 },
+
+            // --- KALUTARA DISTRICT ---
+            { name: "Kaluthara Public Market", lat: 6.5854, lng: 79.9607 },
+            { name: "Keselwatta Public Market", lat: 6.7261, lng: 79.9284 },
+            { name: "Aluthgama Fish Market", lat: 6.4385, lng: 80.0002 },
+            { name: "Wadduwa Public Market", lat: 6.6692, lng: 79.9329 },
+            { name: "Horana public Market", lat: 6.7118, lng: 80.0622 }
+        ];
+
+        // Your exact short-answer field parameter: entry.1704639995
+        var formBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdEsVeE307TTZaVyZSsqgRC2y5DkR3PQYdFPghekwCROTeHUQ/viewform?usp=pp_url&entry.1704639995=";
+
+        // Populate map pins
+        markets.forEach(function(market) {
+            var fullFormUrl = formBaseUrl + encodeURIComponent(market.name);
+
+            var popupHTML = `
+                <div>
+                    <h3 class="popup-title">${market.name}</h3>
+                    <p style="margin:0; font-size:12px; color:#7f8c8d;">Western Province, Sri Lanka</p>
+                    <a href="${fullFormUrl}" target="_blank" class="report-btn">🚨 Report Waste Issue</a>
+                </div>
+            `;
+
+            L.marker([market.lat, market.lng])
+                .addTo(map)
+                .bindPopup(popupHTML);
+        });
+    </script>
+</body>
+</html>
